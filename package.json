@@ -14,7 +14,8 @@
     "build:backend": "cd packages/backend && npm run build",
     "build:frontend": "cd packages/frontend && npm run build",
     "start": "cd packages/backend && npm run start",
-    "prisma:generate": "cd packages/backend && npm run prisma:generate",
+    "postinstall": "npm run prisma:generate",
+    "prisma:generate": "cd packages/backend && npx prisma@6.15.0 generate",
     "prisma:migrate": "cd packages/backend && npm run prisma:migrate:deploy",
     "prisma:studio": "cd packages/backend && npm run prisma:studio",
     "test": "npm run test:backend && npm run test:frontend",
@@ -36,14 +37,16 @@
   "author": "Your Name",
   "license": "MIT",
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "prisma": "6.15.0",
+    "@prisma/engines": "6.15.0"
+  },
+  "dependencies": {
+    "@prisma/client": "6.15.0"
   },
   "engines": {
     "node": ">=20.0.0",
     "npm": ">=9.0.0"
-  },
-  "dependencies": {
-    "@prisma/client": "5.22.0",
-    "prisma": "5.22.0"
   }
 }
+
