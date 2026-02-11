@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:20-bullseye-slim
 
 WORKDIR /app
 
@@ -6,20 +6,20 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci --only=production --no-optional --no-audit
 
-# Backend - PRIMERO copia el código, DESPUÉS instala sus dependencias, DESPUÉS prisma
+# Backend
 COPY packages/backend ./packages/backend
 WORKDIR /app/packages/backend
 
-# 🔧 INSTALAR DEPENDENCIAS DEL BACKEND PRIMERO (incluye @prisma/client)
+# 🔧 Instalar dependencias del backend PRIMERO
 RUN npm ci --only=production --no-optional --no-audit
 
-# 🔧 AHORA sí prisma generate funciona
+# 🔧 Prisma generate (funciona en Debian)
 RUN npx prisma generate --schema=./prisma/schema.prisma
 
 # Build backend
 RUN npm run build
 
-# Frontend (si lo necesitas en la misma imagen)
+# Frontend (si lo necesitas)
 WORKDIR /app/packages/frontend
 COPY packages/frontend ./packages/frontend
 RUN npm ci --only=production --no-optional --no-audit
