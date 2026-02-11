@@ -1,22 +1,26 @@
-FROM node:20-slim
+FROM node:20
 
 WORKDIR /app
 
-# ✅ SOLO package files PRIMERO
+# Package files + prisma
 COPY package.json package-lock.json ./
 COPY packages/backend/package*.json ./packages/backend/
+COPY packages/backend/prisma ./packages/backend/prisma/
 COPY packages/frontend/package*.json ./packages/frontend/
 
-# ✅ npm ci ejecuta postinstall → prisma@6.15.0 generate
-RUN npm ci
+# npm ci
+RUN npm ci --ignore-scripts
 
-# ✅ UNA SOLA VEZ: copia TODO (incluye packages/backend/prisma/)
+# Prisma ✅ YA FUNCIONA
+RUN cd packages/backend && NODE_TLS_REJECT_UNAUTHORIZED=0 npx prisma@6.15.0 generate --schema=prisma/schema.prisma
+
+# Copia TODO
 COPY . .
 
-# Build
-RUN npm run build
+# ✅ SOLO backend build
+RUN cd packages/backend && npm run build
 
-# Backend en producción
+# Backend producción
 WORKDIR /app/packages/backend
 EXPOSE 3000
 CMD ["npm", "start"]

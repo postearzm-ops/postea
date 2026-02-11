@@ -3,10 +3,7 @@
 
 import { Router, Request, Response } from 'express';
 import prisma from '../lib/prisma';
-// ❌ MAL - Import por defecto
-//import redis from '../lib/redis';
-// ✅ BIEN - Import nombrado
-import { getClient } from '../lib/redis';  // ← CAMBIA ./lib por ../lib
+import redis from '../lib/redis';
 import llmService from '../services/llm.service';
 
 const router = Router();
@@ -50,8 +47,7 @@ router.get('/health/detailed', async (req: Request, res: Response) => {
 
   // Check Redis
   try {
-  //  const redisClient = await redis.getClient();
-    const redisClient = await getClient();
+    const redisClient = await redis.getClient();
     await redisClient.ping();
     healthStatus.services.redis = 'healthy';
   } catch (error) {

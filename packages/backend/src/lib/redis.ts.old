@@ -5,12 +5,13 @@ class RedisClient {
   private client: ReturnType<typeof createClient> | null = null;
   private isConnecting = false;
 
-  async getClient(): Promise<ReturnType<typeof createClient>> {
+  async getClient() {
     if (this.client && this.client.isOpen) {
       return this.client;
     }
 
     if (this.isConnecting) {
+      // Esperar a que termine la conexión actual
       await new Promise(resolve => setTimeout(resolve, 100));
       return this.getClient();
     }
@@ -22,7 +23,7 @@ class RedisClient {
         url: process.env.REDIS_URL || 'redis://localhost:6379'
       });
 
-      this.client.on('error', (err: unknown) => {
+      this.client.on('error', (err) => {
         console.error('Redis Client Error:', err);
       });
 
@@ -33,14 +34,14 @@ class RedisClient {
       await this.client.connect();
       this.isConnecting = false;
       return this.client;
-    } catch (error: unknown) {
+    } catch (error) {
       this.isConnecting = false;
       console.error('❌ Error conectando a Redis:', error);
       throw error;
     }
   }
 
-  async disconnect(): Promise<void> {
+  async disconnect() {
     if (this.client && this.client.isOpen) {
       await this.client.quit();
       this.client = null;
@@ -48,6 +49,4 @@ class RedisClient {
   }
 }
 
-export const redis = new RedisClient();
-export const getClient = (): Promise<ReturnType<typeof createClient>> => redis.getClient();
-
+export default new RedisClient();
