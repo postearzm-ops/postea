@@ -1,0 +1,23 @@
+[phases.setup]
+nixPkgs = ['nodejs-20_x', 'npm-9_x', 'openssl']
+
+[phases.install]
+dependsOn = ['setup']
+cmds = [
+  'cd packages/backend && npm ci --only=production',
+  'cd packages/frontend && npm ci --only=production'
+]
+
+[phases.build]
+dependsOn = ['install']
+cmds = [
+  'cd packages/backend && npx prisma generate',
+  'cd packages/backend && npm run build',
+  'cd packages/frontend && npm run build'
+]
+
+[start]
+cmd = 'cd packages/backend && npm run start:migrate'
+
+[variables]
+NODE_ENV = 'production'
