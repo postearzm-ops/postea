@@ -8,16 +8,12 @@ COPY packages/backend/prisma ./packages/backend/prisma/
 COPY packages/frontend/package*.json ./packages/frontend/
 
 RUN npm ci --ignore-scripts
-
-# Prisma ✅ Ya funciona
 RUN cd packages/backend && NODE_TLS_REJECT_UNAUTHORIZED=0 npx prisma@6.15.0 generate --schema=prisma/schema.prisma
 
-# Código y build
 COPY . .
 RUN cd packages/backend && npm run build
 
-# 🚀 PRODUCCIÓN - SOLO ESTAS LÍNEAS AL FINAL
-WORKDIR /app
+# 🚨 SOLO ESTAS 3 LÍNEAS AL FINAL
 EXPOSE 8080
 CMD ["node", "packages/backend/dist/index.js"]
 
