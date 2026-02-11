@@ -1,30 +1,28 @@
 FROM node:20-slim
 
-# Instala dependencias necesarias para Prisma WASM
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
-
 WORKDIR /app
 
-# Copia archivos de dependencias PRIMERO
-COPY package*.json ./
+# Copia root package.json y workspaces PRIMERO (crucial para monorepo)
+COPY package.json package-lock.json ./
+COPY packages/backend/package*.json ./packages/backend/
+COPY packages/frontend/package*.json ./packages/frontend/
 COPY prisma ./prisma/
 
-# Instala TODO con versión fija ANTES de generar
+# Instala TODO el monorepo con postinstall automático
 RUN npm ci
-RUN npm install prisma@6.15.0 @prisma/engines@6.15.0 --save-dev --save-exact
 
-# ❌ ELIMINA esta línea problemática:
-# RUN npx prisma generate --schema=./prisma/schema.prisma
+# ✅ NO uses npx prisma generate aquí - postinstall ya lo hizo
 
-# Genera Prisma con VERSIÓN FIJA (IMPORTANTE)
-RUN npx prisma@6.15.0 generate --schema=./prisma/schema.prisma
+# Copia código backend/frontend
+COPY packages/backend ./packages/backend
+COPY packages/frontend ./packages/frontend
+COPY prisma ./prisma
 
-# Copia resto del código
-COPY . .
+# Build completo del monorepo
+RUN npm run build
 
-# Build si tienes TypeScript
-RUN npm run build || echo "No build script"
-
+# Solo ejecuta backend en Railway
+WORKDIR /app/packages/backend
 EXPOSE 3000
 CMD ["npm", "start"]
 
