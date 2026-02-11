@@ -1,5 +1,8 @@
+# ✅ CORREGIDO - Versión que funciona en Railway
+providers = ["node"]
+
 [phases.setup]
-nixPkgs = ['nodejs-20_x', 'npm-9_x', 'openssl']
+nixPkgs = ['nodejs', 'openssl']
 
 [phases.install]
 dependsOn = ['setup']
@@ -20,4 +23,4 @@ cmds = [
 cmd = 'cd packages/backend && npm run start:migrate'
 
 [variables]
-NODE_ENV = 'production'
+NODE_ENV = "production"
