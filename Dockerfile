@@ -1,7 +1,6 @@
 FROM node:20
 WORKDIR /app
 
-# Dependencias
 COPY package.json package-lock.json ./
 COPY packages/backend/package*.json ./packages/backend/
 COPY packages/backend/prisma ./packages/backend/prisma/
@@ -13,7 +12,5 @@ RUN cd packages/backend && NODE_TLS_REJECT_UNAUTHORIZED=0 npx prisma@6.15.0 gene
 COPY . .
 RUN cd packages/backend && npm run build
 
-# 🚨 SOLO ESTAS 3 LÍNEAS AL FINAL
 EXPOSE 8080
 CMD ["node", "packages/backend/dist/index.js"]
-
