@@ -2,26 +2,21 @@ FROM node:20-slim
 
 WORKDIR /app
 
-# Copia root package.json y workspaces PRIMERO (crucial para monorepo)
+# Copia SOLO package files del monorepo PRIMERO
 COPY package.json package-lock.json ./
 COPY packages/backend/package*.json ./packages/backend/
 COPY packages/frontend/package*.json ./packages/frontend/
-COPY prisma ./prisma/
 
-# Instala TODO el monorepo con postinstall automático
+# Instala dependencias (postinstall ejecuta prisma generate AUTOMÁTICAMENTE)
 RUN npm ci
 
-# ✅ NO uses npx prisma generate aquí - postinstall ya lo hizo
+# Copia TODO el código DESPUÉS (incluye prisma/ si existe)
+COPY . .
 
-# Copia código backend/frontend
-COPY packages/backend ./packages/backend
-COPY packages/frontend ./packages/frontend
-COPY prisma ./prisma
-
-# Build completo del monorepo
+# Build completo
 RUN npm run build
 
-# Solo ejecuta backend en Railway
+# Ejecuta backend en producción
 WORKDIR /app/packages/backend
 EXPOSE 3000
 CMD ["npm", "start"]
