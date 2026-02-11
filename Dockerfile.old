@@ -1,29 +1,28 @@
+# Railway ignorará Nixpacks automáticamente al ver Dockerfile
 FROM node:20-alpine
 
 WORKDIR /app
 
-# Copia raíz primero (cache)
+# Copia package.json raíz primero (cache)
 COPY package.json package-lock.json* ./
 RUN npm ci --only=production --no-optional --no-audit
 
-# Backend
+# Instala backend
 COPY packages/backend ./packages/backend
 WORKDIR /app/packages/backend
-
-# Prisma generate SIN database (funciona sin url)
-RUN npx prisma generate --schema=./prisma/schema.prisma
-
-# Build backend
+RUN npx prisma generate
 RUN npm ci --only=production --no-optional --no-audit
 RUN npm run build
 
-# Frontend build
+# Instala frontend (solo build)
 WORKDIR /app/packages/frontend
 RUN npm ci --only=production --no-optional --no-audit
 RUN npm run build
 
-# Start en backend
+# Vuelve al backend para start
 WORKDIR /app/packages/backend
+
+# Puerto dinámico de Railway
 EXPOSE $PORT
 
 CMD ["npm", "run", "start:migrate"]
