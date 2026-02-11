@@ -1,33 +1,25 @@
-FROM node:20-bullseye-slim
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Copia raíz primero (cache)
-COPY package.json package-lock.json* ./
-RUN npm ci --only=production --no-optional --no-audit
+# Copia package files primero
+COPY package*.json ./
+COPY prisma ./prisma/
 
-# Backend
-COPY packages/backend ./packages/backend
-WORKDIR /app/packages/backend
+# Instala dependencias SIN postinstall para evitar conflictos
+RUN npm ci --ignore-scripts --only=production
+RUN npm ci --only=dev
 
-# 🔧 Instalar dependencias del backend PRIMERO
-RUN npm ci --only=production --no-optional --no-audit
+# Genera Prisma ANTES de build
+RUN npx prisma@6.15.0 generate --schema=./prisma/schema.prisma
 
-# 🔧 Prisma generate (funciona en Debian)
-RUN npx prisma generate --schema=./prisma/schema.prisma
+# Copia resto del código
+COPY . .
 
-# Build backend
+# Build (si usas TypeScript)
 RUN npm run build
 
-# Frontend (si lo necesitas)
-WORKDIR /app/packages/frontend
-COPY packages/frontend ./packages/frontend
-RUN npm ci --only=production --no-optional --no-audit
-RUN npm run build
+EXPOSE 3000
 
-# Start en backend
-WORKDIR /app/packages/backend
-EXPOSE $PORT
-
-CMD ["npm", "run", "start:migrate"]
+CMD ["npm", "start"]
 
