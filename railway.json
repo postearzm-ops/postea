@@ -5,7 +5,6 @@
     "dockerfilePath": "Dockerfile"
   },
   "deploy": {
-<<<<<<< HEAD
     "runtime": "V2",
     "numReplicas": 1,
     "startCommand": "node dist/server.js",
@@ -20,9 +19,7 @@
     "restartPolicyType": "ON_FAILURE",
     "healthcheckTimeout": 100,
     "restartPolicyMaxRetries": 10
-=======
     "startCommand": "node dist/server.js"
->>>>>>> f0943d5 (Fix WORKDIR Railway)
   }
 }
 
