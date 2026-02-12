@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc && tsc-alias",
-    "start": "sleep 30 && npx prisma migrate deploy && node dist/server.js"
+    "start": "sleep 30 && npx prisma migrate deploy && node dist/server.js",
     "start:migrate": "npx prisma migrate deploy && npx prisma generate && npm run start",
     "prisma:generate": "prisma generate",
     "prisma:migrate:dev": "prisma migrate dev",
