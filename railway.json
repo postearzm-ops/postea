@@ -18,7 +18,7 @@
     },
     "restartPolicyType": "ON_FAILURE",
     "healthcheckTimeout": 100,
-    "restartPolicyMaxRetries": 10
+    "restartPolicyMaxRetries": 10,
     "startCommand": "node dist/server.js"
   }
 }
